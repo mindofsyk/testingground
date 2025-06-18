@@ -1,0 +1,1247 @@
+<div class="blend-oracle-section" 
+     style="--section-bg-color: {{ section.settings.section_background_color }};
+            --card-closed-bg: {{ section.settings.card_closed_background }};
+            --card-open-bg: {{ section.settings.card_open_background }};
+            --card-border-color: {{ section.settings.card_border_color }};
+            --card-glow-color: {{ section.settings.card_glow_color }};
+            --card-title-color: {{ section.settings.card_title_color }};
+            --card-body-color: {{ section.settings.card_body_color }};
+            --card-title-size: {{ section.settings.card_title_size }}px;
+            --card-body-size: {{ section.settings.card_body_size }}px;
+            --card-border-radius: {{ section.settings.card_border_radius }}px;
+            --card-padding: {{ section.settings.card_padding }}px;
+            --text-color: {{ section.settings.text_color }};
+            --btn-bg-color: {{ section.settings.btn_background_color }};
+            --btn-text-color: {{ section.settings.btn_text_color }};
+            --btn-border-color: {{ section.settings.btn_border_color }};
+            --btn-border-width: {{ section.settings.btn_border_width }}px;
+            --btn-text-size: {{ section.settings.btn_text_size }}px;
+            --btn-padding-h: {{ section.settings.btn_padding_horizontal }}px;
+            --btn-padding-v: {{ section.settings.btn_padding_vertical }}px;
+            --btn-spacing: {{ section.settings.btn_spacing }}px;
+            --shine-color-1: {{ section.settings.shine_color_1 }};
+            --shine-color-2: {{ section.settings.shine_color_2 }};
+            --shine-opacity: {{ section.settings.shine_opacity }};
+            --shine-duration: {{ section.settings.shine_duration }}s;">
+  
+  <div class="oracle-container">
+    {% if section.settings.section_title != blank %}
+      <h2 class="oracle-title" style="color: var(--text-color);">
+        {{ section.settings.section_title }}
+      </h2>
+    {% endif %}
+    
+    {% if section.settings.section_subtitle != blank %}
+      <p class="oracle-subtitle" style="color: var(--text-color);">
+        {{ section.settings.section_subtitle }}
+      </p>
+    {% endif %}
+
+    <div class="card-deck-container">
+      <div class="card-deck" data-card-count="{{ section.blocks.size }}">
+        {% for block in section.blocks %}
+          <div class="oracle-card" 
+               data-card-id="{{ forloop.index }}"
+               data-blend-name="{{ block.settings.blend_name }}"
+               data-reflection="{{ block.settings.reflection_text }}"
+               data-cta-text="{{ block.settings.cta_text }}"
+               data-cta-link="{{ block.settings.cta_link }}"
+               data-open-title="{{ block.settings.open_card_title }}"
+               data-open-content="{{ block.settings.open_card_content }}"
+               data-original-index="{{ forloop.index0 }}"
+               {{ block.shopify_attributes }}>
+            
+            <div class="card-back">
+              <div class="card-pattern"></div>
+              <div class="card-sigil">{{ section.settings.card_sigil | default: '✦' }}</div>
+              {% if section.settings.enable_glow_effect %}
+                <div class="card-glow"></div>
+              {% endif %}
+              {% if section.settings.enable_shine_effect %}
+                <div class="card-shine"></div>
+              {% endif %}
+            </div>
+            
+            <div class="card-front">
+              <div class="card-content">
+                <h3 class="blend-name">{{ block.settings.open_card_title | default: block.settings.blend_name }}</h3>
+                <div class="card-body">
+                  {{ block.settings.open_card_content | default: block.settings.reflection_text }}
+                </div>
+                {% if block.settings.cta_text != blank and block.settings.cta_link != blank %}
+                  <a href="{{ block.settings.cta_link }}" class="oracle-cta">
+                    {{ block.settings.cta_text }}
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if section.settings.show_reshuffle %}
+      <button class="reshuffle-btn">
+        {{ section.settings.reshuffle_text | default: 'Reshuffle the Cards' }}
+      </button>
+    {% endif %}
+  </div>
+</div>
+
+<div class="mobile-overlay"></div>
+
+<style>
+  .blend-oracle-section {
+    background-color: var(--section-bg-color);
+    padding: 80px 20px;
+    min-height: 600px;
+    position: relative;
+  }
+
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 999;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .mobile-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .oracle-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .oracle-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+  }
+
+  .oracle-subtitle {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    margin-bottom: 3rem;
+    opacity: 0.9;
+    font-style: italic;
+  }
+
+  .card-deck-container {
+    padding: 40px 20px;
+    margin-bottom: var(--btn-spacing);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Section-wide shine effect */
+  .card-deck-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.8) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: sectionShine calc(var(--shine-duration, 4))s infinite;
+    animation-delay: 2s;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .card-deck {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    transition: all 0.5s ease;
+  }
+
+  .oracle-card {
+    width: 180px;
+    min-height: 280px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    border-radius: var(--card-border-radius);
+    overflow: hidden;
+    border: 2px solid var(--card-border-color);
+    flex-shrink: 0;
+    animation: magicFloat 6s ease-in-out infinite;
+  }
+
+  .oracle-card:nth-child(2n) {
+    animation-delay: -2s;
+  }
+
+  .oracle-card:nth-child(3n) {
+    animation-delay: -4s;
+  }
+
+  .oracle-card:hover:not(.flipped) {
+    {% if section.settings.enable_hover_effects %}
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    {% endif %}
+    animation-play-state: paused;
+  }
+
+  .oracle-card.flipped {
+    width: 300px;
+    min-height: 400px;
+    z-index: 10;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    animation-play-state: paused;
+  }
+
+  .oracle-card.closing {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .oracle-card.opening {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .card-back,
+  .card-front {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--card-padding);
+    box-sizing: border-box;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .card-back {
+    background: var(--card-closed-bg);
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .card-front {
+    background: var(--card-open-bg);
+    opacity: 0;
+    transform: scale(0.9);
+    pointer-events: none;
+  }
+
+  .oracle-card.flipped .card-back {
+    opacity: 0;
+    transform: scale(1.1);
+    pointer-events: none;
+  }
+
+  .oracle-card.flipped .card-front {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: all;
+  }
+
+  .card-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    opacity: 0.3;
+  }
+
+  .card-sigil {
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--card-glow-color);
+    text-shadow: 0 0 15px var(--card-glow-color);
+    z-index: 4;
+    position: relative;
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  .card-glow {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: calc(var(--card-border-radius) + 3px);
+    box-shadow: 0 0 20px var(--card-glow-color);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .card-shine {
+    position: absolute;
+    top: -10%;
+    left: -150%;
+    width: 100%;
+    height: 120%;
+    background: linear-gradient(
+      110deg,
+      transparent 0%,
+      transparent 40%,
+      rgba(255, 255, 255, 0.8) 50%,
+      rgba(255, 255, 255, 0.4) 55%,
+      transparent 65%,
+      transparent 100%
+    );
+    transform: skewX(-20deg);
+    animation: cardShineMove 4s infinite;
+    animation-delay: 2s;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .oracle-card:hover .card-glow {
+    {% if section.settings.enable_glow_effect %}
+      opacity: 0.6;
+    {% endif %}
+  }
+
+  .oracle-card.flipped .card-glow {
+    {% if section.settings.enable_glow_effect %}
+      opacity: 0.8;
+    {% endif %}
+  }
+
+  .card-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .blend-name {
+    font-size: var(--card-title-size);
+    font-weight: 600;
+    color: var(--card-title-color);
+    margin: 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    line-height: 1.2;
+  }
+
+  .card-body {
+    font-size: var(--card-body-size);
+    color: var(--card-body-color);
+    line-height: 1.5;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    opacity: 0.95;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .oracle-cta {
+    background: linear-gradient(135deg, var(--card-glow-color) 0%, var(--card-glow-color) 100%);
+    color: #1a1a2e;
+    padding: 12px 24px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-shadow: none;
+  }
+
+  .oracle-cta:hover {
+    {% if section.settings.enable_hover_effects %}
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    {% endif %}
+    color: #1a1a2e;
+    text-decoration: none;
+  }
+
+  .reshuffle-btn {
+    background: var(--btn-bg-color);
+    border: var(--btn-border-width) solid var(--btn-border-color);
+    color: var(--btn-text-color);
+    padding: var(--btn-padding-v) var(--btn-padding-h);
+    border-radius: 30px;
+    font-size: var(--btn-text-size);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    margin-top: var(--btn-spacing);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  .reshuffle-btn:hover {
+    {% if section.settings.enable_btn_hover_effect %}
+      border-color: var(--card-glow-color);
+      color: var(--card-glow-color);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    {% endif %}
+  }
+
+  .reshuffle-btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .reshuffle-btn.shuffling {
+    animation: reshuffleButtonPulse 0.6s ease-in-out;
+    pointer-events: none;
+  }
+
+  /* Enhanced shuffle animations */
+  .oracle-card.shuffling {
+    transform: rotateY(90deg) !important;
+    transition: transform 0.3s ease-in-out !important;
+    pointer-events: none;
+  }
+
+  .oracle-card.shuffling:nth-child(1) { transition-delay: 0ms; }
+  .oracle-card.shuffling:nth-child(2) { transition-delay: 80ms; }
+  .oracle-card.shuffling:nth-child(3) { transition-delay: 160ms; }
+  .oracle-card.shuffling:nth-child(4) { transition-delay: 240ms; }
+  .oracle-card.shuffling:nth-child(5) { transition-delay: 320ms; }
+  .oracle-card.shuffling:nth-child(6) { transition-delay: 400ms; }
+
+  .oracle-card.shuffle-in {
+    animation: cardShuffleIn 0.8s ease-out !important;
+    animation-fill-mode: both;
+  }
+
+  .oracle-card.shuffle-in:nth-child(1) { animation-delay: 0ms; }
+  .oracle-card.shuffle-in:nth-child(2) { animation-delay: 80ms; }
+  .oracle-card.shuffle-in:nth-child(3) { animation-delay: 160ms; }
+  .oracle-card.shuffle-in:nth-child(4) { animation-delay: 240ms; }
+  .oracle-card.shuffle-in:nth-child(5) { animation-delay: 320ms; }
+  .oracle-card.shuffle-in:nth-child(6) { animation-delay: 400ms; }
+
+  @keyframes sectionShine {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes cardShineMove {
+    0% {
+      left: -150%;
+      opacity: 0;
+    }
+    5% {
+      opacity: 1;
+    }
+    20% {
+      left: -50%;
+      opacity: 1;
+    }
+    25% {
+      left: 150%;
+      opacity: 0;
+    }
+    100% {
+      left: 150%;
+      opacity: 0;
+    }
+  }
+
+  @keyframes cardShuffleIn {
+    0% {
+      transform: rotateY(90deg) scale(0.9);
+      opacity: 0.7;
+    }
+    100% {
+      transform: rotateY(0deg) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% { 
+      opacity: 0.7; 
+      transform: scale(1); 
+    }
+    50% { 
+      opacity: 1; 
+      transform: scale(1.05); 
+    }
+  }
+
+  @keyframes magicFloat {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    25% {
+      transform: translateY(-3px) rotate(0.5deg);
+    }
+    50% {
+      transform: translateY(-6px) rotate(0deg);
+    }
+    75% {
+      transform: translateY(-3px) rotate(-0.5deg);
+    }
+  }
+
+  @keyframes reshuffleButtonPulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+    }
+  }
+
+  @keyframes mobileCardOpen {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes mobileCardClose {
+    0% {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Enhanced Mobile Styles */
+  @media (max-width: 768px) {
+    .blend-oracle-section {
+      padding: 60px 15px;
+    }
+    
+    .card-deck {
+      /* Mobile: Create a more visually appealing grid layout */
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 15px;
+      justify-items: center;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    
+    .oracle-card {
+      width: 170px;
+      min-height: 260px;
+      /* Maintain some floating animation but reduced */
+      animation: mobileFloat 8s ease-in-out infinite;
+    }
+    
+    .oracle-card:nth-child(odd) {
+      /* Offset odd cards slightly for visual interest */
+      transform: translateY(-10px);
+    }
+    
+    .oracle-card.flipped {
+      /* Smooth mobile positioning */
+      width: 300px;
+      min-height: 380px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 1000;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      border-radius: calc(var(--card-border-radius) + 5px);
+      animation: mobileCardOpen 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+    }
+
+    .oracle-card.closing {
+      animation: mobileCardClose 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards !important;
+    }
+    
+    .card-deck-container {
+      padding: 30px 15px;
+    }
+
+    /* Reduce dance intensity on mobile */
+    @keyframes mobileFloat {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-3px);
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .oracle-title {
+      font-size: clamp(2rem, 8vw, 2.5rem);
+      margin-bottom: 0.5rem;
+    }
+    
+    .oracle-subtitle {
+      font-size: clamp(0.9rem, 4vw, 1.1rem);
+      margin-bottom: 2rem;
+    }
+    
+    .card-deck {
+      /* Small mobile: 2x2 grid layout */
+      grid-template-columns: 1fr 1fr;
+      gap: 15px 10px;
+      max-width: 350px;
+      margin: 0 auto;
+    }
+    
+    .oracle-card {
+      width: min(160px, 45vw);
+      min-height: 240px;
+      /* Maintain slight offset for visual interest */
+    }
+    
+    .oracle-card:nth-child(odd) {
+      transform: translateY(-5px);
+    }
+    
+    .oracle-card.flipped {
+      width: min(320px, 95vw);
+      min-height: 400px;
+      /* Better mobile positioning */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+    }
+
+    .card-content {
+      padding: 12px;
+      gap: 0.7rem;
+    }
+    
+    .blend-name {
+      font-size: clamp(1.1rem, 4.5vw, 1.3rem);
+    }
+    
+    .card-body {
+      font-size: clamp(0.8rem, 3.2vw, 0.95rem);
+    }
+    
+    .oracle-cta {
+      padding: 8px 16px;
+      font-size: 0.8rem;
+    }
+
+    /* Maintain subtle floating animation on small screens */
+    .oracle-card {
+      animation: mobileFloat 10s ease-in-out infinite;
+    }
+  }
+
+  /* Landscape mobile optimization */
+  @media (max-width: 768px) and (orientation: landscape) {
+    .card-deck {
+      grid-template-columns: repeat(3, 1fr);
+      max-width: 600px;
+      gap: 15px;
+    }
+    
+    .oracle-card {
+      width: 150px;
+      min-height: 220px;
+    }
+    
+    .oracle-card:nth-child(odd) {
+      transform: none;
+    }
+  }
+
+  /* Accessibility improvements */
+  @media (prefers-reduced-motion: reduce) {
+    .oracle-card {
+      animation: none !important;
+    }
+    
+    .card-sigil {
+      animation: none !important;
+    }
+    
+    .card-shine {
+      animation: none !important;
+    }
+    
+    * {
+      transition-duration: 0.1s !important;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .oracle-card {
+      border-width: 3px;
+      box-shadow: none !important;
+    }
+    
+    .card-glow {
+      display: none;
+    }
+    
+    .card-shine {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const cards = document.querySelectorAll('.oracle-card');
+  const reshuffleBtn = document.querySelector('.reshuffle-btn');
+  const cardDeck = document.querySelector('.card-deck');
+  const mobileOverlay = document.querySelector('.mobile-overlay');
+  let activeCard = null;
+  let isMobile = window.innerWidth <= 768;
+  let isTransitioning = false;
+
+  // Update mobile detection on resize
+  window.addEventListener('resize', function() {
+    isMobile = window.innerWidth <= 768;
+  });
+
+  let cardData = [];
+  cards.forEach((card, index) => {
+    cardData.push({
+      element: card,
+      originalIndex: index,
+      blendName: card.dataset.blendName,
+      reflection: card.dataset.reflection,
+      ctaText: card.dataset.ctaText,
+      ctaLink: card.dataset.ctaLink,
+      openTitle: card.dataset.openTitle,
+      openContent: card.dataset.openContent
+    });
+  });
+
+  function closeCard(card, callback) {
+    if (isTransitioning) return;
+    isTransitioning = true;
+    
+    card.classList.add('closing');
+    card.classList.remove('flipped');
+    
+    if (isMobile) {
+      mobileOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    
+    setTimeout(() => {
+      card.classList.remove('closing');
+      isTransitioning = false;
+      if (callback) callback();
+    }, 300);
+  }
+
+  function openCard(card) {
+    if (isTransitioning) return;
+    isTransitioning = true;
+    
+    card.classList.add('opening');
+    card.classList.add('flipped');
+    activeCard = card;
+    
+    if (isMobile) {
+      mobileOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    setTimeout(() => {
+      card.classList.remove('opening');
+      isTransitioning = false;
+    }, 400);
+  }
+
+  cards.forEach(card => {
+    card.addEventListener('click', function(e) {
+      e.stopPropagation();
+      
+      if (isTransitioning) return;
+      
+      // If clicking the same active card, close it
+      if (this === activeCard) {
+        closeCard(this);
+        activeCard = null;
+        return;
+      }
+
+      // If there's an active card, close it first, then open the new one
+      if (activeCard) {
+        const newCard = this;
+        closeCard(activeCard, () => {
+          setTimeout(() => {
+            openCard(newCard);
+          }, 100); // Small delay for smoother transition
+        });
+      } else {
+        // No active card, just open this one
+        openCard(this);
+      }
+    });
+  });
+
+  if (reshuffleBtn) {
+    reshuffleBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      
+      if (activeCard) {
+        closeCard(activeCard);
+        activeCard = null;
+      }
+      
+      this.classList.add('shuffling');
+      this.disabled = true;
+      
+      // Start the shuffling flip animation
+      cards.forEach((card, index) => {
+        setTimeout(() => {
+          card.classList.add('shuffling');
+        }, index * 80);
+      });
+      
+      // Wait for flip to complete, then shuffle content and animate back
+      setTimeout(() => {
+        // Shuffle the card data
+        const shuffledData = [...cardData];
+        for (let i = shuffledData.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffledData[i], shuffledData[j]] = [shuffledData[j], shuffledData[i]];
+        }
+        
+        // Update card content
+        cards.forEach((card, index) => {
+          const newData = shuffledData[index];
+          const blendNameEl = card.querySelector('.blend-name');
+          const cardBodyEl = card.querySelector('.card-body');
+          const ctaEl = card.querySelector('.oracle-cta');
+          
+          if (blendNameEl) blendNameEl.textContent = newData.openTitle || newData.blendName;
+          if (cardBodyEl) cardBodyEl.innerHTML = newData.openContent || newData.reflection;
+          if (ctaEl) {
+            ctaEl.textContent = newData.ctaText;
+            ctaEl.href = newData.ctaLink;
+          }
+          
+          card.dataset.blendName = newData.blendName;
+          card.dataset.reflection = newData.reflection;
+          card.dataset.ctaText = newData.ctaText;
+          card.dataset.ctaLink = newData.ctaLink;
+          card.dataset.openTitle = newData.openTitle;
+          card.dataset.openContent = newData.openContent;
+        });
+        
+        // Remove shuffling class and add shuffle-in
+               cards.forEach((card, index) => {
+         card.classList.remove('shuffling');
+         setTimeout(() => {
+           card.classList.add('shuffle-in');
+         }, index * 80);
+       });
+       
+       // Clean up shuffle-in classes after animation
+       setTimeout(() => {
+         cards.forEach(card => {
+           card.classList.remove('shuffle-in');
+         });
+         
+         this.classList.remove('shuffling');
+         this.disabled = false;
+       }, 800 + (cards.length * 80));
+       
+     }, 500); // Wait for flip animation to complete
+   });
+ }
+
+ // Close card when clicking overlay (mobile)
+ if (mobileOverlay) {
+   mobileOverlay.addEventListener('click', function() {
+     if (activeCard) {
+       closeCard(activeCard);
+       activeCard = null;
+     }
+   });
+ }
+
+ // Close card with escape key
+ document.addEventListener('keydown', function(e) {
+   if (e.key === 'Escape' && activeCard) {
+     closeCard(activeCard);
+     activeCard = null;
+   }
+ });
+
+ // Prevent body scroll when card is open on mobile
+ document.addEventListener('touchmove', function(e) {
+   if (activeCard && isMobile) {
+     e.preventDefault();
+   }
+ }, { passive: false });
+});
+</script>
+
+{% schema %}
+{
+ "name": "Blend Oracle Cards",
+ "tag": "section",
+ "class": "section",
+ "settings": [
+   {
+     "type": "text",
+     "id": "section_title",
+     "label": "Section Title",
+     "default": "Discover Your Perfect Blend"
+   },
+   {
+     "type": "textarea",
+     "id": "section_subtitle",
+     "label": "Section Subtitle",
+     "default": "Let the oracle guide you to your ideal herbal experience"
+   },
+   {
+     "type": "color",
+     "id": "section_background_color",
+     "label": "Section Background",
+     "default": "#1a1a2e"
+   },
+   {
+     "type": "color",
+     "id": "text_color",
+     "label": "Text Color",
+     "default": "#ffffff"
+   },
+   {
+     "type": "header",
+     "content": "Card Styling"
+   },
+   {
+     "type": "color",
+     "id": "card_closed_background",
+     "label": "Card Back Background",
+     "default": "#16213e"
+   },
+   {
+     "type": "color",
+     "id": "card_open_background",
+     "label": "Card Front Background",
+     "default": "#0f172a"
+   },
+   {
+     "type": "color",
+     "id": "card_border_color",
+     "label": "Card Border Color",
+     "default": "#3b4b6b"
+   },
+   {
+     "type": "color",
+     "id": "card_glow_color",
+     "label": "Card Glow Color",
+     "default": "#fbbf24"
+   },
+   {
+     "type": "color",
+     "id": "card_title_color",
+     "label": "Card Title Color",
+     "default": "#fbbf24"
+   },
+   {
+     "type": "color",
+     "id": "card_body_color",
+     "label": "Card Body Color",
+     "default": "#e2e8f0"
+   },
+   {
+     "type": "range",
+     "id": "card_title_size",
+     "label": "Card Title Size (px)",
+     "min": 14,
+     "max": 28,
+     "step": 1,
+     "default": 18
+   },
+   {
+     "type": "range",
+     "id": "card_body_size",
+     "label": "Card Body Size (px)",
+     "min": 12,
+     "max": 20,
+     "step": 1,
+     "default": 14
+   },
+   {
+     "type": "range",
+     "id": "card_border_radius",
+     "label": "Card Border Radius (px)",
+     "min": 0,
+     "max": 30,
+     "step": 1,
+     "default": 15
+   },
+   {
+     "type": "range",
+     "id": "card_padding",
+     "label": "Card Padding (px)",
+     "min": 10,
+     "max": 40,
+     "step": 1,
+     "default": 20
+   },
+   {
+     "type": "text",
+     "id": "card_sigil",
+     "label": "Card Back Symbol",
+     "default": "✦"
+   },
+   {
+     "type": "header",
+     "content": "Effects"
+   },
+   {
+     "type": "checkbox",
+     "id": "enable_glow_effect",
+     "label": "Enable Glow Effect",
+     "default": true
+   },
+   {
+     "type": "checkbox",
+     "id": "enable_shine_effect",
+     "label": "Enable Shine Effect",
+     "default": true
+   },
+   {
+     "type": "checkbox",
+     "id": "enable_hover_effects",
+     "label": "Enable Hover Effects",
+     "default": true
+   },
+   {
+     "type": "color",
+     "id": "shine_color_1",
+     "label": "Shine Color 1",
+     "default": "#ffffff"
+   },
+   {
+     "type": "color",
+     "id": "shine_color_2",
+     "label": "Shine Color 2",
+     "default": "#fbbf24"
+   },
+   {
+     "type": "range",
+     "id": "shine_opacity",
+     "label": "Shine Opacity",
+     "min": 0.1,
+     "max": 1.0,
+     "step": 0.1,
+     "default": 0.8
+   },
+   {
+     "type": "range",
+     "id": "shine_duration",
+     "label": "Shine Duration (seconds)",
+     "min": 2,
+     "max": 10,
+     "step": 1,
+     "default": 4
+   },
+   {
+     "type": "header",
+     "content": "Reshuffle Button"
+   },
+   {
+     "type": "checkbox",
+     "id": "show_reshuffle",
+     "label": "Show Reshuffle Button",
+     "default": true
+   },
+   {
+     "type": "text",
+     "id": "reshuffle_text",
+     "label": "Reshuffle Button Text",
+     "default": "Reshuffle the Cards"
+   },
+   {
+     "type": "color",
+     "id": "btn_background_color",
+     "label": "Button Background",
+     "default": "rgba(255, 255, 255, 0.1)"
+   },
+   {
+     "type": "color",
+     "id": "btn_text_color",
+     "label": "Button Text Color",
+     "default": "#ffffff"
+   },
+   {
+     "type": "color",
+     "id": "btn_border_color",
+     "label": "Button Border Color",
+     "default": "#3b4b6b"
+   },
+   {
+     "type": "range",
+     "id": "btn_border_width",
+     "label": "Button Border Width (px)",
+     "min": 0,
+     "max": 5,
+     "step": 1,
+     "default": 2
+   },
+   {
+     "type": "range",
+     "id": "btn_text_size",
+     "label": "Button Text Size (px)",
+     "min": 12,
+     "max": 20,
+     "step": 1,
+     "default": 16
+   },
+   {
+     "type": "range",
+     "id": "btn_padding_horizontal",
+     "label": "Button Horizontal Padding (px)",
+     "min": 15,
+     "max": 50,
+     "step": 1,
+     "default": 30
+   },
+   {
+     "type": "range",
+     "id": "btn_padding_vertical",
+     "label": "Button Vertical Padding (px)",
+     "min": 8,
+     "max": 25,
+     "step": 1,
+     "default": 15
+   },
+   {
+     "type": "range",
+     "id": "btn_spacing",
+     "label": "Button Top Spacing (px)",
+     "min": 20,
+     "max": 80,
+     "step": 5,
+     "default": 40
+   },
+   {
+     "type": "checkbox",
+     "id": "enable_btn_hover_effect",
+     "label": "Enable Button Hover Effect",
+     "default": true
+   }
+ ],
+ "blocks": [
+   {
+     "type": "oracle_card",
+     "name": "Oracle Card",
+     "settings": [
+       {
+         "type": "text",
+         "id": "blend_name",
+         "label": "Blend Name",
+         "default": "Mystic Blend"
+       },
+       {
+         "type": "textarea",
+         "id": "reflection_text",
+         "label": "Card Reflection Text",
+         "default": "This blend calls to those seeking balance and inner wisdom."
+       },
+       {
+         "type": "text",
+         "id": "open_card_title",
+         "label": "Open Card Title (optional)",
+         "info": "If left blank, will use Blend Name"
+       },
+       {
+         "type": "textarea",
+         "id": "open_card_content",
+         "label": "Open Card Content (optional)",
+         "info": "If left blank, will use Reflection Text"
+       },
+       {
+         "type": "text",
+         "id": "cta_text",
+         "label": "Call to Action Text",
+         "default": "Explore This Blend"
+       },
+       {
+         "type": "url",
+         "id": "cta_link",
+         "label": "Call to Action Link"
+       }
+     ]
+   }
+ ],
+ "presets": [
+   {
+     "name": "Blend Oracle Cards",
+     "blocks": [
+       {
+         "type": "oracle_card",
+         "settings": {
+           "blend_name": "Mystic Moonlight",
+           "reflection_text": "For those who seek clarity in the depths of night, this blend whispers ancient secrets.",
+           "cta_text": "Discover Moonlight",
+           "cta_link": "/collections/mystic-blends"
+         }
+       },
+       {
+         "type": "oracle_card",
+         "settings": {
+           "blend_name": "Solar Awakening",
+           "reflection_text": "Energize your spirit with the power of the sun. Perfect for new beginnings.",
+           "cta_text": "Embrace the Sun",
+           "cta_link": "/collections/energy-blends"
+         }
+       },
+       {
+         "type": "oracle_card",
+         "settings": {
+           "blend_name": "Earth's Embrace",
+           "reflection_text": "Ground yourself in nature's wisdom. This blend connects you to ancient earth energies.",
+           "cta_text": "Feel the Earth",
+           "cta_link": "/collections/grounding-blends"
+         }
+       }
+     ]
+   }
+ ]
+}
+{% endschema %}
